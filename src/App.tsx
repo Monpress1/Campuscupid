@@ -1,6 +1,6 @@
 // src/App.tsx
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthPage } from './pages/Auth';
 import { FeedPage } from './pages/Feed';
 import { ProfilePage } from './pages/ProfilePage';
@@ -9,25 +9,22 @@ import { supabase } from './supabase';
 function AppContent() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setLoading(false);
-    });
+    };
+
+    checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (session) {
-        navigate('/feed');
-      } else {
-        navigate('/login');
-      }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, session]); // 'session' added to the dependency array
+  }, []);
 
   if (loading) {
     return (
@@ -39,14 +36,11 @@ function AppContent() {
 
   return (
     <Routes>
-      <Route 
-        path="/" 
-        element={session ? <Navigate to="/feed" /> : <Navigate to="/login" />} 
-      />
+      <Route path="/" element={session ? <Navigate to="/feed" /> : <Navigate to="/login" />} />
       <Route path="/login" element={<AuthPage />} />
       <Route path="/signup" element={<AuthPage />} />
-      <Route path="/feed" element={session ? <FeedPage /> : <AuthPage />} />
-      <Route path="/profile" element={session ? <ProfilePage /> : <AuthPage />} />
+      <Route path="/feed" element={session ? <FeedPage /> : <Navigate to="/login" />} />
+      <Route path="/profile" element={session ? <ProfilePage /> : <Navigate to="/login" />} />
     </Routes>
   );
 }

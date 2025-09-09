@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { AuthPage } from './pages/Auth';
 import { FeedPage } from './pages/Feed';
+import { ProfilePage } from './pages/ProfilePage'; // New import
 import { supabase } from './supabase';
 
 // This component manages the session and routing.
@@ -35,6 +36,7 @@ function AppContent() {
       <Route path="/login" element={<AuthPage />} />
       <Route path="/signup" element={<AuthPage />} />
       <Route path="/feed" element={session ? <FeedPage /> : <AuthPage />} />
+      <Route path="/profile" element={session ? <ProfilePage /> : <AuthPage />} />
     </Routes>
   );
 }

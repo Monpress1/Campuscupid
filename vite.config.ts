@@ -3,6 +3,11 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: './', // This tells Vite to use relative paths for assets
-  publicDir: 'public' // This specifies where the static assets are located
+  base: './',
+  publicDir: 'public',
+  build: {
+    rollupOptions: {
+      input: './index.html', // ensures Vite uses index.html at root
+    },
+  },
 });
